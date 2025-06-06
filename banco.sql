@@ -8,5 +8,5 @@ CREATE TABLE livros
     CONSTRAINT pk_livros PRIMARY KEY (id)
 );
 
-ALTER TABLE livros ADD COLUMN Autor VARCHAR(50);
-UPDATE livros SET Autor = 'Não informado' WHERE Autor IS NULL;
+ALTER TABLE livros ADD COLUMN autor VARCHAR(50);
+UPDATE livros SET autor = 'Não informado' WHERE autor IS NULL;
