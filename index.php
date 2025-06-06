@@ -15,18 +15,40 @@ $stm->execute();
 $livros = $stm->fetchAll();
 //echo "<pre>" . print_r($livros, true) . "</pre>";
 $msgErro = "";
+$titulo = "";
+$autor = "";
+$genero = "";
+$qtdPag = "";
+
 //Verificar se o usuário já clicou no Gravar
-if(isset($_POST["titulo"])) {
+if(isset($_POST["titulo"])) 
+{
     //Obter os valores digitados pelo usuário
-    $titulo = $_POST["titulo"];
-    $autor  = $_POST["autor"];
+    $titulo = trim($_POST["titulo"]);
+    $autor  = trim($_POST["autor"]);
     $genero = $_POST["genero"];
     $qtdPag = $_POST["qtd_paginas"];
 
     $erros = array();
-    if(!$titulo || strlen($titulo) < 3 || strlen($titulo) > 50)
+    if(!$titulo)
     {
-        array_push($erros,"Informe o titulo, ele deve possuir entre 3 e 50 caracteres.");
+        array_push($erros,"Informe o titulo");
+    }elseif (strlen($titulo) < 3) 
+    {
+        array_push($erros,"Seu título deve ter no mínimo 3 caracteres.");
+    }elseif (strlen($titulo) > 50) 
+    {
+        array_push($erros,"Seu título deve ter no máximo 50 caracteres.");
+    }else
+    {
+        $sqlTitulo = "SELECT id FROM livros WHERE titulo = ?";
+        $stm = $con->prepare($sqlTitulo);
+        $stm->execute([$titulo]);
+        $qtdTitulos = count($stm->fetchAll());
+        if ($qtdTitulos > 0) 
+        {
+            array_push($erros,"Seu título deve ser único.");
+        }
     }
     if(!$autor)
     {
@@ -36,9 +58,12 @@ if(isset($_POST["titulo"])) {
     {
         array_push($erros,"Informe o genero");
     }
-    if(!$qtdPag || $qtdPag < 1)
+    if(!$qtdPag)
     {
-        array_push($erros,"Informe as paginas, você deve informar ao menos uma.");
+        array_push($erros,"Informe as paginas");
+    }elseif ($qtdPag <= 1) 
+    {
+        array_push($erros,"O número de páginas deve ser maior ou igual a 1");
     }
 
     if(count($erros) == 0)
@@ -112,28 +137,28 @@ if(isset($_POST["titulo"])) {
     <form action="" method="POST">
         <div style="margin-bottom: 10px;">
             <label for="titulo">Título: </label>
-            <input type="text" name="titulo" id="titulo" />
+            <input type="text" name="titulo" id="titulo" value="<?= $titulo ?>"/>
         </div>
 
         <div style="margin-bottom: 10px;">
             <label for="autor">Autor: </label>
-            <input type="text" name="autor" id="autor" />
+            <input type="text" name="autor" id="autor" value="<?= $autor ?>"/>
         </div>
 
         <div style="margin-bottom: 10px;">
             <label for="genero">Gênero: </label>
             <select name="genero" id="genero">
                 <option value="">---Selecione---</option>
-                <option value="D">Drama</option>
-                <option value="F">Ficção</option>
-                <option value="R">Romance</option>
-                <option value="O">Outro</option>
+                <option value="D" <?=$genero == "D"?"selected":""?>>Drama</option>
+                <option value="F"<?=$genero == "F"?"selected":""?>>Ficção</option>
+                <option value="R"<?=$genero == "R"?"selected":""?>>Romance</option>
+                <option value="O"<?=$genero == "O"?"selected":""?>>Outro</option>
             </select>
         </div>
 
         <div style="margin-bottom: 10px;">
             <label for="qtd_paginas">Páginas: </label>
-            <input type="number" name="qtd_paginas" id="qtd_paginas" />
+            <input type="number" name="qtd_paginas" id="qtd_paginas" value="<?= $qtdPag ?>"/>
         </div>
 
         <div style="margin-bottom: 10px;">
