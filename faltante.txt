@@ -1,3 +1,0 @@
-falta verificar os repetidos
-falta verificar o vazio
-falta usar a funcao count para verificar os repetidos
